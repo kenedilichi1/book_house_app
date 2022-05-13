@@ -11,13 +11,13 @@ const getUser = async function(request,response){
         const getOneUser = await dataBaseConnection.collection('users')
             .find({username: user},{projection:{_id:0, password:0, confirmPassword:0}})
             .toArray()
-        profile.push(getOneUser)
+        // profile.push(getOneUser)
         
         response.status(200).json({
             error: false,
             description: "successful",
             message: "Fetched user",
-            payload: profile
+            payload: getOneUser
         })
         console.log(profile, "profile")
     } catch (error) {

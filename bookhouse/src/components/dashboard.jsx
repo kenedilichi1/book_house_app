@@ -11,60 +11,93 @@ const Logo = styled.img`
 `
 const UserPicture = styled.img`
     width: 5rem;
+    border-radius: 6rem;
 ` 
+const Profile = styled.div`
+    border: 1px solid gray;
+    width: 70%;
+    margin:4rem auto 0;
+    text-align: center;
+    padding: 2rem 0;
+    color: #FFFFFF;
+    font-size: 1rem;
+    font-weight: 400;
+    border-radius: 1rem;
+`
+const Nav = styled.div`
+    display: flex;
+    flex-direction:row;
+    align-items: center;
+    background: #080414;
+    padding: .7rem 1.5rem;
+
+`
+const Details = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap:1rem;
+`
+
 
 const UserDashBoard = () => {
-    const [person, setPerson] = useState("");
+    const [person, setPerson] = useState([]);
     const username = useParams();
     
     console.log(username, "username");
 
     async function getUser(){
-        const userDetails = await axios.get(`http://localhost:5200/auth/users/${username.username}`)
+        const response = await axios.get(`http://localhost:5200/auth/users/${username.username}`)
        
-        .then((response) =>{
-            const profile = response.data.payload;
-            
-            setPerson(profile)
-            console.log(profile, "profile")
-        })
-        console.log(userDetails, "userdetails")
+        
+        console.log(response, "userdetails")
 
-        return ;
+        return response.data.payload ;
     }
     // console.log(getUser)
    
-    console.log(person, "person");
-    const userProfile = person[0]
     
     useEffect(()=>{
         (async function(){
             const displayUser = await getUser()
-            return displayUser
+            setPerson(displayUser);
+            
         })()
     }, [])
-    
+    console.log(person, "person")
    
     
     return ( 
         <div>
-            <div className="nav">
+            <Nav>
                 <div>
-                    <img src={BookLogo} alt= ""/>
+                    <Logo src={BookLogo} alt= ""/>
                 </div>
-            </div>
+            </Nav>
             
-            {userProfile.map((user)=>{
+            {person.map((user)=>{
 
                 return(
-                    <div>
+                    <Profile>
                         <div>
-                            <img src= {ProfilePicture} alt="" />
+                            <UserPicture src= {ProfilePicture} alt="" />
                         </div>
-                        <h3>{user.fullName}</h3>
-                        <h3>{user.username}</h3>
-                        <h3>{user.email}</h3>
-                    </div>
+                        <div>
+                            <Details>
+                                <h3>Full Name:</h3>
+                                <h3>{user.fullName}</h3>
+                            </Details>
+                            <Details>
+                                <h3>Username:</h3>
+                                <h3>{user.username}</h3>
+                            </Details>
+                            <Details>
+                                <h3>Email:</h3>
+                                <h3>{user.email}</h3>
+                            </Details> 
+                        </div>
+                    </Profile>
                 )
             })}
             

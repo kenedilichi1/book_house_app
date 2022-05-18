@@ -1,7 +1,7 @@
 import React from "react";
 import BookLogo from "../assets/images/book_house_logo.png";
 import styled from "styled-components";
-import SignIn from "./sign_in";
+import SignIn from "./authorization/sign_in";
 import { NavLink } from "react-router-dom";
 
 

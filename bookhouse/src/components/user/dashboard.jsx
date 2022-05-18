@@ -1,21 +1,18 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import BookLogo from "../assets/images/book_house_logo.png";
-import ProfilePicture from "../assets/images/profile.jpg";
-import { useParams } from "react-router-dom";
+import UserNav from "./nav";
+import ProfilePicture from "../../assets/images/profile.jpg";
+import { useParams,NavLink,useNavigate } from "react-router-dom";
 
-const Logo = styled.img`
-    width: 3.5rem;
-    border-radius: 50px;
-`
+
 const UserPicture = styled.img`
     width: 5rem;
     border-radius: 6rem;
 ` 
 const Profile = styled.div`
     border: 1px solid gray;
-    width: 70%;
+    width: 20rem;
     margin:4rem auto 0;
     text-align: center;
     padding: 2rem 0;
@@ -24,14 +21,7 @@ const Profile = styled.div`
     font-weight: 400;
     border-radius: 1rem;
 `
-const Nav = styled.div`
-    display: flex;
-    flex-direction:row;
-    align-items: center;
-    background: #080414;
-    padding: .7rem 1.5rem;
 
-`
 const Details = styled.div`
     display: flex;
     flex-direction: row;
@@ -44,8 +34,10 @@ const Details = styled.div`
 const UserDashBoard = () => {
     const [person, setPerson] = useState([]);
     const username = useParams();
-    
-    console.log(username, "username");
+    let bookhouse = localStorage.getItem("bookHouse");
+    let user = JSON.parse(bookhouse).username;
+
+    console.log(user, "username");
 
     async function getUser(){
         const response = await axios.get(`http://localhost:5200/auth/users/${username.username}`)
@@ -70,11 +62,7 @@ const UserDashBoard = () => {
     
     return ( 
         <div>
-            <Nav>
-                <div>
-                    <Logo src={BookLogo} alt= ""/>
-                </div>
-            </Nav>
+            <UserNav username={user} />
             
             {person.map((user)=>{
 

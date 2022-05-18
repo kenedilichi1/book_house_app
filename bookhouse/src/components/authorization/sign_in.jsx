@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import BookLogo from "../assets/images/book_house_logo.png";
+import BookLogo from "../../assets/images/book_house_logo.png";
 
 const SignInMainDiv = styled.div`
     margin-top: 3rem;

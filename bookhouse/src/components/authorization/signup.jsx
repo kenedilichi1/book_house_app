@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import BookLogo from "../assets/images/book_house_logo.png";
+import BookLogo from "../../assets/images/book_house_logo.png";
 import styled from "styled-components";
 import { NavLink, useNavigate } from "react-router-dom";
 import axios from 'axios';

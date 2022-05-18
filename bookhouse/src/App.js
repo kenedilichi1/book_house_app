@@ -2,10 +2,12 @@ import './App.css';
 import React from 'react';
 import {BrowserRouter,Route, Redirect, Routes,} from "react-router-dom";
 import Home from './components/home';
-import SignIn from './components/sign_in';
+import SignIn from './components/authorization/sign_in';
 import AboutUs from './components/aboutus';
-import SignUp from './components/signup';
-import UserDashBoard from './components/dashboard';
+import SignUp from './components/authorization/signup';
+import UserDashBoard from './components/user/dashboard';
+import UserHome from './components/user/home';
+import UserShelf from './components/user/shelf';
 function App() {
   return (
     
@@ -23,6 +25,11 @@ function App() {
         <Route path= "/signup" element={<SignUp/>}/>
 
         <Route path= "/dashboard/:username" element={<UserDashBoard/>} />
+        
+        <Route path= "/:username/home" element={<UserHome/>} />
+
+        <Route path= "/:username/shelf" element = {<UserShelf/>} />
+
         
       </Routes>
     </BrowserRouter>

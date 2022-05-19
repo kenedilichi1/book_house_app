@@ -7,13 +7,13 @@ const getAllBooks = async function(request,response){
     let books = []
     const allBooks = await dbConnection.collection('books')
         .find()
-        .forEach(book=>books.push(book))
+        .toArray()
         
     response.status(200).json({
         error: false,
         description: "books exist",
         messaga: "getting all books",
-        payload: books
+        payload: allBooks
     })
 }
 

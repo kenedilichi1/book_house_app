@@ -25,24 +25,9 @@ const signupMiddleWare = async function(request, response, next){
     
     })
     try {
-        let {fullName, username, email, password, confirmPassword} = request.body;
-        if ( fullName && username && email && password && confirmPassword !==""){
-            const bookDetails = await schema.validateAsync({
-                fullName: fullName,
-                username: username,
-                email: email,
-                password: password,
-                confirmPassword: confirmPassword
-            })
-        }else{
-            response.status(400).json({
-                erroe: true,
-                description: "missing field",
-                message: "all fields are required",
-                payload: "Null"
-
-            })
-        }
+        const data = request.body
+        const bookDetails = await schema.validateAsync({...data})
+        request.app.set("bookDetails", bookDetails)
         next()
     } catch (error) {
         response.status(400).json({
@@ -71,21 +56,20 @@ const loginMiddleWare = async function (request, response, next){
     })
 
     try {
-        let {email, password} = request.body;
+        let logInDetails = request.body;
 
-        if(email && password){
+        const value = await schema.validateAsync({...logInDetails})
+        request.app.set("loginCredentials", value)
+        next()
         
-            const value = await schema.validateAsync({
-                email: request.body.email,
-                password: request.body.password
-            })
-        
-            next()
-        }else{
-            response.status(401).json({message: "provide username/email  and password "})
-        }
     } catch (error) {
-        console.log(error)
+        console.log(error.details[0].message);
+        response.status(400).json({
+            error: true,
+            description: "Bad request",
+            message: error.details[0].message,
+            payload: null
+        })
     }
     
     

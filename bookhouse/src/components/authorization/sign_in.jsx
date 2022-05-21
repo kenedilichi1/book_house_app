@@ -122,24 +122,33 @@ const SignIn = ()=>{
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     let navigate = useNavigate();
-    let bookhouse = localStorage.getItem("bookHouse");
-    let username = JSON.parse(bookhouse).username
+    
     async function signin(){
         try {
             const user ={
                 email: email,
                 password: password
             }
-            const userSignIn = await axios.post('http://localhost:5200/auth/users/login', user)
-                .then(response=>(localStorage.setItem("bookHouse", JSON.stringify({
-                    id: response.data.payload.id, 
-                    email: response.data.payload.email,
-                    username: response.data.payload.username
-                 }))))
-                .then(navigate(`/dashboard/${username}`))
+            if(!user.email&& !user.password){
+                throw new Error("enter correct credentials")
+            }
+            const userSignIn = await axios.post('http://localhost:5200/auth/users/login', user);
+            console.log(userSignIn, "userSignIn")
+            
+            localStorage.setItem("bookHouse", JSON.stringify({
+                id:userSignIn.data.payload.id, 
+                email: userSignIn.data.payload.email,
+                username: userSignIn.data.payload.username
+            }))
+            let bookhouse = localStorage.getItem("bookHouse");
+            let username = JSON.parse(bookhouse).username;
+            navigate(`/dashboard/${username}`);
             console.log(username)
+            
+            
         } catch (error) {
-            console.log(error)
+            console.log(error, "error")
+            return
         }
     }
 

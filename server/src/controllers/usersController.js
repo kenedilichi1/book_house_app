@@ -29,12 +29,14 @@ const getUser = async function(request,response){
 // signup controller
 const signUp = async function(request, response){
     const dataBaseConnection = await dataBase.connectToDb();
-    const hash = await argon2.hash(request.body.password,{
-        type: argon2.argon2id
-    });
+    
     try {
-        let {fullName,username, email } = request.body;
+        const requestPayload = request.app.get("bookDetails")
+        let {fullName,username, email } = requestPayload;
 
+        const hash = await argon2.hash(requestPayload.password,{
+            type: argon2.argon2id
+        });
         // checking if username and password already exists
         const checkUsername = await dataBaseConnection.collection('users')
             .findOne({username: username});
@@ -42,21 +44,21 @@ const signUp = async function(request, response){
         const checkEmail = await dataBaseConnection.collection('users')
             .findOne({email: email});
 
-        if (checkUsername && checkUsername._id){
+        if (checkUsername){
             response.status(400).json({
                 error: true,
                 description: "username taken",
                 message: "pick a different name",
-                payload: "Null"
+                payload: null
             });
             return
         }
-        if (checkEmail && checkEmail._id){
+        if (checkEmail){
             response.status(400).json({
                 error: true,
                 description: "Email already exists",
                 message: "Try a different email",
-                payload: "Null"
+                payload: null
             });
             return
         }
@@ -67,8 +69,8 @@ const signUp = async function(request, response){
                 fullName: fullName,
                 username: username,
                 email: email,
-                password: hash,
-                confirmPassword: hash
+                password: hash
+                
             })
         response.status(201).json({
             error: false,
@@ -88,61 +90,52 @@ const signUp = async function(request, response){
 
 // login controller
 const login = async function(request,response){
-    const dataBaseConnection = await dataBase.connectToDb();
+
     try {
-        let {email, password} =  request.body;
+        const requestPayload = request.app.get("loginCredentials")
+        const dataBaseConnection = await dataBase.connectToDb();
 
-        if (email !== ""){
-            // checking if user email exists
-            const checkUser = await dataBaseConnection.collection('users')
-            .findOne({email: email});
-
-            // verifying hased password
-            const  checkPassword = await argon2.verify( checkUser.password, password );
-            console.log(checkPassword)
-            if(!checkUser){
-                response.status(401).json({
-                    error: true,
-                    description: "No user",
-                    message: "Could not find user",
-                    payload: "Null"
-                })
-                return
-            }
-            
-            if(checkPassword === true){
-                response.json({
-                    error: false,
-                    description: "password correct",
-                    message: "Logged in successfully",
-                    payload: {
-                        message: `welcome, ${checkUser.username}`,
-                        id: checkUser._id,
-                        email: checkUser.email,
-                        username: checkUser.username
-                    }
-                })
-                
-                return 
-            }else{
-                response.status(401).json({
-                    error: true,
-                    description: "password incorrect",
-                    message: "Login denied",
-                    payload: "Null"
-                })
-            }
-        }else{
-            response.status(401).json({
-                error: true,
-                description: "username/email required",
-                message: "Username/Email",
-                payload: "Null"
-            })
+        if(requestPayload.email === ""){
+            throw new Error("email can not be empty")
         }
         
+        // checking if user email exists
+        const checkUser = await dataBaseConnection.collection('users')
+        .findOne({email: requestPayload.email});
+
+        if(!checkUser){
+            throw new Error("Invalid login credentials")
+        }
+        // verifying hased password
+        const  checkPassword = await argon2.verify( checkUser.password, requestPayload.password );
+        console.log(checkPassword);
+        if(!checkPassword){
+            throw new Error("Invalid login credentials");
+            
+        }
+        
+        response.json({
+            error: false,
+            description: "password correct",
+            message: "Logged in successfully",
+            payload: {
+                message: `welcome, ${checkUser.username}`,
+                id: checkUser._id,
+                email: checkUser.email,
+                username: checkUser.username
+            }
+        })
+        
+        return;
+        
     } catch (error) {
-        console.log(error)
+        response.status(400).json({
+            error: true,
+            description: "bad request",
+            message: "incorrect input",
+            payload: error
+        });
+        return;
     }   
     
 

@@ -33,7 +33,7 @@ const getBookShelf = async function(request,response){
             messaga: "getting all books",
             payload: shelf
         })
-        
+        return;
     } catch (error) {
         console.log(error)
     }
@@ -43,41 +43,34 @@ const getBookShelf = async function(request,response){
 const addToBookShelf = async function(request,response){
     try {
         const dataBaseConnection = await database.connectToDb();
-        let {username, bookName} = request.body;
-        if(username && bookName !==""){
-            
-            // find user id with username
-            const userId= await dataBaseConnection.collection('users')
+        let {username, bookName} = request.app.get("userBooks");
+        if(username && bookName ===""){  
+            throw new Error("Invalid enrty")
+        }
+        // find user id with username
+        const userId= await dataBaseConnection.collection('users')
                 .findOne({username:username})
 
-            // find book id with book name
-            const bookId = await dataBaseConnection.collection('books')
-                .findOne({bookName:bookName})
+        // find book id with book name
+        const bookId = await dataBaseConnection.collection('books')
+            .findOne({bookName:bookName})
 
-            // inserting to bookshelf collection
-            const sort= await dataBaseConnection.collection('bookShelf')
-                .insertOne({
-                    users_id: userId._id,
-                    books_id: bookId._id
-                })
+        // inserting to bookshelf collection
+        const sort= await dataBaseConnection.collection('bookShelf')
+            .insertOne({
+                users_id: userId._id,
+                books_id: bookId._id
+            })
 
-            response.status(200).json({
-                error: false,
-                description: "submit successful",
-                message: "Book added to Book Shelf",
-                payload: bookId.bookName
-            })
-        }else{
-            response.status(400).json({
-                error: true,
-                description: "submit unsuccessful",
-                message: "Book and Username is required",
-                payload: "Null"
-            })
-        }
-        
+        response.status(200).json({
+            error: false,
+            description: "submit successful",
+            message: "Book added to Book Shelf",
+            payload: bookId.bookName
+        })
+        return;
     } catch (error) {
-        console.log(error)
+        response.status(400).json(error)
     }
 }
 

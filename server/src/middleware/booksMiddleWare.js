@@ -24,30 +24,22 @@ const addBooks = async function(request,response, next){
             .items(joi.string().valid())
     })
     try {
-        let {bookName, author,rating,genre} = request.body
-        if ( bookName && author && rating && genre !==""){
-            const bookDetails = await schema.validateAsync({
-                bookName: bookName,
-                author: author,
-                rating: rating,
-                genre: genre
-            })
-        }else{
-            response.status(401).json({
-                erroe: true,
-                description: "missing field",
-                message: "all fields are required"
-            })
-        }
+        const data = request.body
+        
+        const bookDetails = await schema.validateAsync({...data})
+        request.app.set("books", bookDetails)
+        next()
     } catch (error) {
         response.status(401).json({
             error: true,
+            description: "bad input",
+            message: "Incorrect entry",
             payload: error.details[0].message
         })
         return 
     }
 
-    next()
+    
 }
 
 module.exports ={

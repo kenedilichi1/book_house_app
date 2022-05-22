@@ -26,8 +26,8 @@ const signupMiddleWare = async function(request, response, next){
     })
     try {
         const data = request.body
-        const bookDetails = await schema.validateAsync({...data})
-        request.app.set("bookDetails", bookDetails)
+        const userDetails = await schema.validateAsync({...data})
+        request.app.set("userDetails", userDetails)
         next()
     } catch (error) {
         response.status(400).json({

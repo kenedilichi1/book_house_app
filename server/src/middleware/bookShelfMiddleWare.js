@@ -15,14 +15,12 @@ const addToShelf = async function(request,response, next){
                 .required(),
         })
 
-        let {username, bookName} = request.body
-        const userBooks = await shema.validateAsync({
-            users_id: username,
-            books_id: bookName
-        })
+        let data = request.body
+        const userBooks = await shema.validateAsync({...data})
+        request.app.set("userBooks", userBooks)
         next()
     } catch (error) {
-        console.log(error)
+        response.status(400).json(error)
     }
 }
 

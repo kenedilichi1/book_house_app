@@ -4,7 +4,7 @@ const middleWares = require('../middleware/usersMiddleware');
 const controllers = require('../controllers/usersController')
 
 //get user
-router.get('/users/:username', controllers.getUser) 
+router.get('/users/:username',middleWares.jwtAuthentication, controllers.getUser) 
 
 // user signup 
 router.post('/users/signup', middleWares.signupMiddleWare,controllers.signUp)

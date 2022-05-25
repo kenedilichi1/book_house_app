@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useReducer, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import BookLogo from "../../assets/images/book_house_logo.png";
@@ -140,6 +140,7 @@ const SignIn = ()=>{
                 email: userSignIn.data.payload.email,
                 username: userSignIn.data.payload.username
             }))
+            localStorage.setItem("token", userSignIn.data.token);
             let bookhouse = localStorage.getItem("bookHouse");
             let username = JSON.parse(bookhouse).username;
             navigate(`/dashboard/${username}`);

@@ -1,6 +1,31 @@
 const Joi = require('joi');
+const jwt = require('jsonwebtoken');
+require ('dotenv').config();
 
+// jwt authentication
+const jwtAuthentication = async function(request, response, next){
+    try {
+        const authHeader = request.headers.authorization;
+        const secret = process.env.ACCESS_TOKEN_SECRET;
+    
+        if (authHeader){
+            const token = authHeader.split(' ')[1];
+    
+            jwt.verify(token,secret,(error, user)=>{
+                if(error){
+                    throw new Error("invalid token");
+                };
+                request.user = user;
+            });
+            next()
+        };
+    } catch (error) {
+        console.log(error)
+    }
+    
+}
 
+// signup authentication
 const signupMiddleWare = async function(request, response, next){
 
     const schema = Joi.object({
@@ -78,5 +103,6 @@ const loginMiddleWare = async function (request, response, next){
 
 module.exports ={
     signupMiddleWare,
-    loginMiddleWare
+    loginMiddleWare,
+    jwtAuthentication
 }

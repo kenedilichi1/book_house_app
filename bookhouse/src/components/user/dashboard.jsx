@@ -36,11 +36,16 @@ const UserDashBoard = () => {
     const username = useParams();
     let bookhouse = localStorage.getItem("bookHouse");
     let user = JSON.parse(bookhouse).username;
+    const token = localStorage.getItem("token")
 
     console.log(user, "username");
 
     async function getUser(){
-        const response = await axios.get(`http://localhost:5200/auth/users/${username.username}`)
+        const response = await axios.get(`http://localhost:5200/auth/users/${username.username}`,{
+           headers: {
+               'Authorization': `Bearer ${token}`
+           }
+        })
        
         
         console.log(response, "userdetails")

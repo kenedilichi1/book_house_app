@@ -5,7 +5,7 @@ const bookShelfController = require('../controllers/bookShelfController')
 
 
 // get user bookshelf
-router.get('/books/:username', bookShelfController.getBookShelf)
+router.get('/:username/books', bookShelfController.getBookShelf)
 
 
 

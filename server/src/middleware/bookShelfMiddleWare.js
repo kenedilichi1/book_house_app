@@ -4,12 +4,12 @@ const joi = require('joi');
 const addToShelf = async function(request,response, next){
     try {
         const shema = joi.object({
-            users_id: joi.string()
+            username: joi.string()
                 .uppercase()
                 .lowercase()
                 .required(),
             
-            books_id: joi.string()
+            bookName: joi.string()
                 .uppercase()
                 .lowercase()
                 .required(),

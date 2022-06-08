@@ -1,4 +1,7 @@
-const database = require('../model/database')
+const database = require('../model/database');
+const jwt = require('jsonwebtoken');
+const { ObjectId } = require('mongodb');
+require ('dotenv').config();
 
 // get all user books
 const getBookShelf = async function(request,response){
@@ -44,33 +47,66 @@ const addToBookShelf = async function(request,response){
     try {
         const dataBaseConnection = await database.connectToDb();
         let {username, bookName} = request.app.get("userBooks");
-        if(username && bookName ===""){  
-            throw new Error("Invalid enrty")
-        }
+        
+
+        // jwt verify
+        const authHeader = request.headers.authorization;
+        const secret = process.env.ACCESS_TOKEN_SECRET;
+    
+        if (authHeader){
+            const token = authHeader.split(' ')[1];
+    
+            jwt.verify(token,secret,(error, user)=>{
+                if(error){
+                    throw new Error("invalid token");
+                };
+                request.user = user;
+                request.app.set("jwtUser", request.user.id)
+            });
+            
+        };
+        const jwtId = new ObjectId(`${request.app.get("jwtUser")}`) 
         // find user id with username
-        const userId= await dataBaseConnection.collection('users')
+        const user= await dataBaseConnection.collection('users')
                 .findOne({username:username})
 
+        console.log(!user._id.equals(jwtId), user._id, jwtId);
+
+        if(!user._id.equals(jwtId)){
+            throw new Error("wrong user id")
+        }
         // find book id with book name
-        const bookId = await dataBaseConnection.collection('books')
+        const book = await dataBaseConnection.collection('books')
             .findOne({bookName:bookName})
 
+
+        // check if the user has up to 2 books
+        console.log(user._id)
+        const checkId = await dataBaseConnection.collection('bookShelf')
+            .find({user_id: user._id}).toArray();
+
+        console.log(checkId,"checkId")
+        if(checkId.length === 2){
+            throw new Error("maximum amount reached")
+        }
+        
         // inserting to bookshelf collection
-        const sort= await dataBaseConnection.collection('bookShelf')
+        console.log(book, "book")
+        const borrowedBook= await dataBaseConnection.collection('bookShelf')
             .insertOne({
-                users_id: userId._id,
-                books_id: bookId._id
+                user_id: user._id,
+                book_id: book._id
             })
 
         response.status(200).json({
             error: false,
             description: "submit successful",
             message: "Book added to Book Shelf",
-            payload: bookId.bookName
+            payload: book.bookName
         })
         return;
     } catch (error) {
-        response.status(400).json(error)
+        response.status(400).json(error.message)
     }
 }
 

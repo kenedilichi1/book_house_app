@@ -16,6 +16,7 @@ const jwtAuthentication = async function(request, response, next){
                     throw new Error("invalid token");
                 };
                 request.user = user;
+                console.log(request.user, "request")
             });
             next()
         };
